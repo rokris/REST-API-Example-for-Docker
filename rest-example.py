@@ -1,89 +1,37 @@
-# REST-API Example in a container
-# Python / Flask
+from flask import Flask, jsonify, request
 
-## Build Configuration/Management
-We'll create a file called "Dockerfile" that contains the steps and information needed to build an image.
+app = Flask(__name__)
 
-The build process is done in layers, with the starting point typically being an operating system or, more likely, an OS and framework combination. For example, you need Python 3 installed. So it's pretty common to start from that point. You can -- and there might be good reasons for this -- start with the operating system and then install the framework all inside your image as you build it. You can also do just that -- start with an OS and add a framework -- and save that image and use it as your base for other images.
+accounts = [
+        {'name': "Roger", 'balance': 500},
+        {'name': "Hanne Lene", 'balance': 650},
+        {'name': "Jeanette", 'balance': 200}
+    ]
 
-Yes, like any IT technology, you can make this as simple or as complicated as you like. We'll start with an OS+Framework combination to keep things simple. We'll then copy our code in the image, then make sure the dependencies are installed. Then, we'll give the image a command to be executed when someone runs the image in a container. The following file, "Dockerfile" does those things:
+@app.route("/")
+def helloworld():
+    return "<a href='/accounts'>You will find the API example at this URL /accounts</a>"
 
-```Dockerfile
-FROM python:3
-ADD rest-example.py /
-RUN pip install flask
-RUN pip install flask_restful
-EXPOSE 8080
-CMD [ "python", "./rest-example.py"]
-```
+@app.route("/accounts", methods=["GET"])
+def getAccounts():
+    return jsonify(accounts)
 
-A line-by-line explanation is later in this article, but let's just build thing and run it; we can come back to the details.
-#
-## Let's Get Some Code
-Fork or clone the github repository at
+@app.route("/account/<id>", methods=["GET"])
+def getAccount(id):
+    id = int(id) -1
+    return jsonify(accounts[id])
 
-https://bitbucket.ngdata.no/scm/~rokris/rest-api-example-for-docker.git.
+@app.route("/account", methods=["POST"])
+def addAccount():
+    name = request.json['name']
+    balance = request.json['balance']
+    data = {'name': name, 'balance': balance}
+    accounts.append(data)
 
-Move into the directory
-#
-## Let's Build And Run
+    return jsonify(data)
 
-### To build the image, run
-
-```bash
-docker build -t rest-example .
-```
-
-### To run the image (again, we'll dive into this later), run
-```bash
-docker run -p 8080:8080 rest-example
-```
-
-### Finally, open a second terminal window and run
-```bash
-curl http://localhost:8080
-```
-
-### You should see the web page as the result.
-#
-## The Cycle
-So that's the basic cycle:
-
-    Create the source code
-    Create a Dockerfile file
-    Build the image
-    Run the image in a container
-
-
-## About that Dockerfile
-The file “Dockerfile” is used to guide the construction of your image. Here’s a short, step-by-step breakdown:
-
-```Dockerfile
-FROM python:3
-```
-
-This is your base image, the starting point. In this case, it’s the official image from the Python Software Foundation and has Python:3 installed. That means we don’t have to install any framework; it’s already included with this base image. 
-#
-```Dockerfile
-ADD rest-example.py /
-```
-Copies the program into the image.
-#
-```Dockerfile
-RUN pip install flask
-RUN pip install flask_restful
-```
-Install the packages necessary for our code into the image.
-#
-```Dockerfile
-EXPOSE 8080
-```
-Exposes the application port, 8080, to the outside world.
-#
-```Dockerfile
-CMD [ "python", "./rest-example.py"]
-```
-
+if __name__ == '__main__':
+    app.run('0.0.0.0','8080')
 This is what runs when the image is started (i.e. docker run).
 # 
 ## Running In A Container
