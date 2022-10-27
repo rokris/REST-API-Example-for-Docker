@@ -22,7 +22,7 @@ A line-by-line explanation is later in this article, but let's just build thing 
 ## Let's Get Some Code
 Fork or clone the github repository at
 
-https://bitbucket.ngdata.no/scm/~rokris/rest-api-example-for-docker.git.
+https://github.com/rokris/REST-API-Example-for-Docker
 
 Move into the directory
 #
