@@ -95,4 +95,10 @@ You can see the results of the code by running the curl command or opening your 
 ```bash
 curl -X POST -H "Content-Type: application/json" -d '{"name": "Shovon", "balance": 100}' http://127.0.0.1:8080/account
 ```
-# REST-API-Example-for-Docker
+## Lets publish to the Docker Hub
+
+```bash
+docker login
+docker tag rest-example <dockerhubusername>/rest-example:v1
+docker push <dockerhubusername>/rest-example:v1
+```
